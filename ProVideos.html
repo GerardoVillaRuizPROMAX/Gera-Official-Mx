@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProVideos - Login</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html { height: 100%; font-family: Arial, sans-serif; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; }
+    .app-container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; font-size: 32px; }
+    form { display: flex; flex-direction: column; gap: 15px; }
+    input {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px;
+      background: #ff0050;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .hidden { display: none; }
+    #user-info { text-align: center; margin-top: 20px; }
+  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
+</head>
+<body><div class="app-container">
+  <h1>ProVideos</h1>  <form id="register-form">
+    <input type="email" id="register-email" placeholder="Correo" required>
+    <input type="password" id="register-password" placeholder="Contraseña" required>
+    <button type="submit">Registrarse</button>
+  </form>  <form id="login-form" class="hidden">
+    <input type="email" id="login-email" placeholder="Correo" required>
+    <input type="password" id="login-password" placeholder="Contraseña" required>
+    <button type="submit">Iniciar Sesión</button>
+  </form>  <div id="user-info" class="hidden">
+    <p id="user-email"></p>
+    <button id="logout-button">Cerrar sesión</button>
+  </div><button id="toggle-button">¿Ya tienes cuenta? Inicia sesión</button>
+
+</div><script>
+  // Configuración de Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyB4mvaNn8vCBkAJzbPLJOpjma5fCb5F7aA",
+    authDomain: "provideos-7fd2b.firebaseapp.com",
+    projectId: ""provideos-7fd2b"",
+    storageBucket: "provideos-7fd2b.firebasestorage.app",
+    messagingSenderId: "739682145036",
+    appId: "1:739682145036:web:eb4a5ad6422a6d44e56f29"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  const registerForm = document.getElementById('register-form');
+  const loginForm = document.getElementById('login-form');
+  const toggleButton = document.getElementById('toggle-button');
+  const userInfo = document.getElementById('user-info');
+  const userEmail = document.getElementById('user-email');
+  const logoutButton = document.getElementById('logout-button');
+
+  toggleButton.addEventListener('click', () => {
+    registerForm.classList.toggle('hidden');
+    loginForm.classList.toggle('hidden');
+    toggleButton.textContent = registerForm.classList.contains('hidden') ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión';
+  });
+
+  registerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        alert('Registro exitoso');
+        registerForm.reset();
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  });
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    auth.signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        alert('Bienvenido a ProVideos!');
+        loginForm.reset();
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  });
+
+  logoutButton.addEventListener('click', () => {
+    auth.signOut();
+  });
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      registerForm.classList.add('hidden');
+      loginForm.classList.add('hidden');
+      toggleButton.classList.add('hidden');
+      userInfo.classList.remove('hidden');
+      userEmail.textContent = `Sesión iniciada como: ${user.email}`;
+    } else {
+      userInfo.classList.add('hidden');
+      registerForm.classList.remove('hidden');
+      toggleButton.classList.remove('hidden');
+    }
+  });
+</script></body>
+</html>
